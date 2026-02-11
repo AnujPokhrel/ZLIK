@@ -1,0 +1,207 @@
+pre_train_params:
+  shuffle: True
+  num_workers: 16
+  data_frequency: 20 #Hz
+  horizon_length: 10 #sec
+  # pose_dim: 6
+  # action_dim: 2
+  # pose_key_10s: del_pose_10s
+  # del_actions_key_10s: del_actions_10s
+  # actions_key_10s: actions_10s
+  # damage_text_key: damage_text_parsed
+  
+train_params:
+  debug: True 
+  batch_size: 64 
+  epochs: 200
+  seed: 42
+  device: "cuda:0"
+  optimizer: adamw
+  save_every: 20
+  grad_clipping: 1.0
+  start_saving_best: 50
+  visualize_every: 1
+  lambda_: 0.0
+  validation_percent: 0.2
+  early_stopping:
+    patience: 10
+    min_delta: 0.01
+    enabled: True
+  
+logger:
+  workspace: # workspace name
+  project: dmv # project name
+  experiment_name: gemma_filtText_Trans_learnEmb_weightInit_batchNorm_covReduced" # name of the experiment
+  tags: "gemma filtered_text learnable_emb transformer_encoder clean_data weight_init batchNorm covarianceReduced" # tags for the experiment
+  resume: False # (boolean) whether to resume training or not
+  online: True # (boolean) whether to store logs online or not
+  experiment_key: "" # can be retrieved from logger dashboard, available if only resuming
+  offline_directory: "./logs" # where to store log data
+  disabled: False # disable the comet ml
+  upload_model: False # upload model to comet
+  log_env_details: False
+  auto_histogram_weight_logging: True # allows you to enable/disable histogram logging for biases and weights
+  auto_histogram_gradient_logging: True # allows you to enable/disable automatic histogram logging of gradients
+  auto_histogram_activation_logging: True # allows you to enable/disable automatic histogram logging of activations
+
+data:
+  data_frequency: 20
+  horizon_length: 10
+
+
+dataloader:
+  num_workers: 16
+  batch_size: 64
+  shuffle: True
+  pin_memory: True
+
+dataset:
+  root: ExtractedPkl/DamagedVehicle/
+  data_stats: damaged_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  del_actions_key_10s: "del_ctrl_seq"
+  actions_key_10s: "ctrl_seq"
+  damage_text_key: "damage_text_mid"
+  damage_embedding_key: "text_embedding_all"
+
+clean_dynamics_model: 
+  #old
+  # pose_dim: 6
+  # action_dim: 2
+  # data_frequency: 20
+  # horizon_length: 2
+  # signature_dim: 6 #output signature dim pose_dot basically
+  # root: ExtractedPkl/CleanVehicle20Hz
+  # data_stats: clean_stats_20hz.pkl
+  # pose_key_10s: "del_pose_seq"
+  # actions_key_10s: "action_seq"
+  # gt_pose_key: "res_del_pose"
+  # prediction_horizon: 1
+
+  #new
+  data_frequency: 20
+  pose_dim: 6
+  action_dim: 2
+  history_length: 40
+  in_features: 8
+  model_dimensions: 128
+  prediction_horizon: 5
+  num_of_blocks: 6
+  kernel_size: 3
+  dropout: 0.3
+  root: ExtractedPkl/CleanVehicle20Hz
+  data_stats: clean_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "ctrl_seq"
+  gt_pose_key: "res_del_pose"
+
+residual_dynamics_model:
+  pose_dim: 6
+  action_dim: 2
+  data_frequency: 20
+  horizon_length: 2
+  signature_dim: 6 #output signature dim pose_dot basically
+  root: ExtractedPkl/CleanVehicle20Hz
+  data_stats: clean_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "action_seq"
+  gt_pose_key: "res_del_pose"
+  dropout_p: 0.2
+  wheelbase: 2.9
+  prediction_horizon: 1
+
+LSTM:
+  pose_dim: 6
+  action_dim: 2
+  hidden_dim: 128
+  num_layers: 2
+  dropout_percent: 0.2
+  root: ExtractedPkl/CleanVehicle5Hz    #only used for training
+  data_stats: clean_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "action_seq"
+  gt_pose_key: "res_del_pose"
+  data_frequency: 20      #only being used in testing
+
+anycar_transformer:
+  state_dim: 6
+  action_dim: 2
+  output_dim: 6
+  latent_dim: 64
+  num_heads: 4
+  num_layers: 2
+  dropout: 0.2
+  horizon_length: 2
+  data_frequency: 20
+  prediction_horizon: 10
+
+  root: ExtractedPkl/CleanVehicle20Hz    #only used for training
+  data_stats: clean_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "action_seq"
+  gt_pose_key: "res_del_pose_seq"
+  future_actions_key: "fut_action_seq"
+  attack: False 
+  noise: False
+
+directory:
+  model_name: "clean_dynamics_model"
+  save: SavedModels
+  load: ""
+
+pretraining:
+  text_dim: 768
+  signature_dim: 128
+
+
+# embedding_model: "embedding_gemma"
+model:
+  embedding_model: "embedding_gemma"
+  text_dim: 768
+  signature_dim: 128
+  pose_dim: 6
+  action_dim: 2
+
+transformer_encoder:
+  hidden_dimension: 128
+  attention_heads: 8
+  transformer_encoder_layers: 3
+  feedforward_network_dimension: 512
+  dropout: 0.2
+  positional_encoding_type: "learnable"  #sinusoidal  # time #learnable
+
+# optimizer parameters
+adamw:
+  lr: 5e-4
+  betas:
+    - 0.9
+    - 0.999
+  eps: 1e-8
+  weight_decay: 0.03
+  amsgrad: False
+
+adam:
+  lr: 5e-4
+  betas:
+    - 0.9
+    - 0.999
+  eps: 1e-8
+  weight_decay: 0.03
+  amsgrad: False
+
+# RMSprop parameters if using RMSprop optimizer
+rmsprop:
+  lr: 1e-3
+  momentum: 0
+  alpha: 0.99
+  eps: 1e-8
+  centered: False
+  weight_decay: 0
+
+# SGD parameters if using SGD optimizer
+sgd:
+  lr: 5e-2
+  momentum: 0 # momentum factor
+  weight_decay: 0 # weight decay (L2 penalty)
+  dampening: 0 # dampening for momentum
+  nesterov: False # enables Nesterov momentum

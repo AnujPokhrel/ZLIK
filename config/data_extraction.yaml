@@ -1,0 +1,10 @@
+enable_threading: True
+data_folder: VWGenerated/broken 
+output_folder: VW_ExtractedPKL/pure
+sim_frequency: 20 #Hz (Original frequency)
+data_frequency: 20 #Hz (Resampled freqeuency)
+horizon_length: 10.0 #sec
+action_sequence: 10.0 #sec
+resultant_delay_s: 0.0 #sec
+resultant_count: 10 #number of future steps to extract
+# resultant_horizon: 1 #sec

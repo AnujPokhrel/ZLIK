@@ -1,0 +1,164 @@
+host: "localhost"
+port: 25252
+map: "smallgrid"
+scenario_name: "rockbouncer_data_gen"
+
+run_time_s: 20 # total simulation duration
+sim_frequency: 20                     
+num_trials: 90               # number of trials to run
+
+spawn_box:                     # random spawn area (meters)
+  x: [0, 0] 
+  y: [0, 0]                 # min/max bounds
+  z: [5, 15]   # near ground; BeamNG will settle suspension
+
+vehicle_pool:                  # randomly sampled each episode
+  # - {model: "etk800", color: "White"}
+  - {model: "rockbouncer", color: "Orange"}
+  # - {model: "pessima", color: "Blue"}
+
+vehicle_params:                # approximate kinematics per vehicle
+  etk800: {L: 2.70, max_steer_rad: 0.60}
+  rockbouncer: {L: 2.90, max_steer_rad: 0.70}
+  pessima: {L: 2.65, max_steer_rad: 0.60}
+  _default: {L: 2.70, max_steer_rad: 0.60}
+
+# CTRV/CTRA sampling
+#probabilities of each mode (CTRV=constant velocity, CTRA=constant turn rate)
+mode_probs: {CTRV: 0.40, CTRA: 0.60}
+segment_rate_hz: 0.8           # Poisson change-points (avg changes/sec)
+
+v_bounds: [0.0, 9.0]           # m/s
+a_bounds: [-1.0, 2.5]          # m/s^2
+omega_bounds: [-1.0, 1.0]      # rad/s
+
+a_sigma: 0.2                   # small Gaussian noise per step
+omega_sigma: 0.05              # small Gaussian noise per step
+
+a_to_throttle_gain: 0.30       # throttle ≈ gain * (a + bias), clipped
+throttle_bias: 0.15             # helps keep rolling
+max_decel_for_brake: 6.0       # scale negative a → brake in [0,1]
+
+throttle_bounds: [0.0, 0.20]
+brake_bounds: [0.0, 1.0]
+
+out_pickle: "ctrv_a"
+out_pickle_folder: 'GeneratedData/Experiments/etk/'
+log_every_n_steps: 1
+
+#Angle to spawn the vehicle from a height
+spawn_angle: [[1.8, 1.2, 0.99, 3.0], [1.8, -1.2, 0.99, 3.0], [-1.8, 1.2, 0.99, 3.0], [-1.8, -1.2, 0.99, 3.0]]
+spawn_angle_sigma: 0.3
+damage_pool: {
+              tyre_puncture: 1.0, 
+              fall: 1.0,    #       1.0, 
+              tyre&shock&spring: 1.0, # 1.0,
+              multi_tss: 1.0,  #0.2
+              axle_break: 1.0,  #0.1
+              none: 1.0
+              }
+
+#part_beam_id:
+etk800: {
+    # "axle_RR": [3179],
+    # "axle_RL": [3191],
+    "driveshaft": [3253],
+    "halfshaft_RR": [3254],
+    "halfshaft_RL": [3255],
+    "spring_RR": [3258],
+    "spring_RL": [3259],
+    "shock_RR": [3260],
+    "shock_RL": [3261],
+    "axle_FR": [3388],
+    "axle_FL": [3397],
+    "spring_FR": [3456],
+    "spring_FL": [3457],
+    "shock_FR": [3458],
+    "shock_FL": [3459],
+
+    # combined shock + spring
+    "shock_spring_RR": [3258, 3260],
+    "shock_spring_RL": [3259, 3261],
+    "shock_spring_FR": [3456, 3458],
+    "shock_spring_FL": [3457, 3459],
+
+    #tyre blowout
+    # TODO: Verify if these are correct and also whether they have been implemented 
+    "tyre_FL": [4703, 4956],
+    "tyre_RL": [3958, 4039],
+    "tyre_FR": [4339, 4526],
+    "tyre_RR": [3712, 3614],
+} 
+
+rockbouncer: {
+    "axle_RR": [1059],
+    "axle_RL": [1065],
+    "axle_FR": [1423],
+    "axle_FL": [1430],
+
+    "coilover_RR": [1231],
+    "coilover_RL": [1232],
+    "coilover_FR": [1624],
+    "coilover_FL": [1625],
+
+    "shock_FR": [1682],
+    "shock_FL": [1683],
+    "shock_RR": [1289],
+    "shock_RL": [1290],
+
+    "driveshaft_F": [1705],       # keep original separate
+    "driveshaft": [1409],
+    "driveshaft_F_dup": [1706],   # explicit duplicate key
+
+    "halfshaft_FR": [1707],
+    "halfshaft_FL": [1708],
+
+    # combined coilover + shock
+    "shock_spring_RR": [1231, 1289],
+    "shock_spring_RL": [1232, 1290],
+    "shock_spring_FR": [1624, 1682, 1708],
+    "shock_spring_FL": [1625, 1683, 1708],
+
+    #tyre blowout
+    "tyre_FL": [4703, 4956],
+    "tyre_RL": [3958, 4039],
+    "tyre_FR": [4339, 4526],
+    "tyre_RR": [3712, 3614],
+}
+
+
+pessima: {
+    "halfshaft_FR": [2676],
+    "halfshaft_FL": [2677],
+    "axle_RR": [2778],
+    "axle_RL": [2788],
+    # "axle_FR": [2929],
+    # "axle_FL": [2936],
+
+    "shock_spring_FR": [],
+    "shock_spring_FL": [],
+    "shock_spring_RL": [],
+    "shock_spring_RR": []
+}
+
+
+wheel_ids: {
+  RR: 0,
+  RL: 1,
+  FR: 2,
+  FL: 3
+}
+
+adjacent_pairs:  [
+    ["FR", "FL"],  # front axle
+    ["FL", "RL"],  # left side
+    ["RL", "RR"],  # rear axle
+    ["RR", "FR"],  # right side
+]
+
+wheel_side_2_text: {
+  FR: "Front Right",
+  FL: "Front Left",
+  RR: "Rear Right",
+  RL: "Rear Left"
+}

@@ -1,0 +1,229 @@
+train_params:
+  debug: False 
+  batch_size: 64 
+  epochs: 50
+  seed: 42
+  device: "cuda:0"
+  optimizer: adamw
+  save_every: 10
+  grad_clipping: 1.0
+  start_saving_best: 10
+  visualize_every: 1
+  lambda_: 0.0
+  validation_percent: 0.2
+  early_stopping:
+    patience: 10
+    min_delta: 0.01
+    enabled: True
+  
+logger:
+  workspace: # workspace name
+  project: zlik # project name
+  experiment_name: cleanTEncDecFT_punc # name of the experiment
+  tags: "Clean SinEmbedding 6DOF" # tags for the experiment
+  resume: False # (boolean) whether to resume training or not
+  online: True # (boolean) whether to store logs online or not
+  experiment_key: "" # can be retrieved from logger dashboard, available if only resuming
+  offline_directory: "./logs" # where to store log data
+  disabled: False # disable the comet ml
+  upload_model: False # upload model to comet
+  log_env_details: False
+  auto_histogram_weight_logging: True # allows you to enable/disable histogram logging for biases and weights
+  auto_histogram_gradient_logging: True # allows you to enable/disable automatic histogram logging of gradients
+  auto_histogram_activation_logging: True # allows you to enable/disable automatic histogram logging of activations
+
+dataloader:
+  num_workers: 16
+  batch_size: 64
+  shuffle: True
+  pin_memory: True
+
+damaged_dynamics:
+  state_dim: 6
+  action_dim: 2
+  output_dim: 6
+  latent_dim: 64
+  sentence_trans_latent_dim: 768
+  text_projector_latent_dim: 128 
+  num_heads: 4
+  num_encoder_layers: 2
+  num_decoder_layers: 2
+  feedforward_dim_encoder: 256
+  feedforward_dim_decoder: 256
+  dropout: 0.2
+  horizon_length: 2
+  data_frequency: 20
+  prediction_horizon: 10
+
+  root: ExtractedPkl/CleanAnyCar #only used for training
+  data_stats: clean_stats_anycar.pkl
+  # data_stats: damaged_stats_20hz.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "ctrl_seq"
+  gt_pose_key: "res_del_pose_seq"
+  future_actions_key: "fut_ctrl_seq"
+  damage_embedding_key: "text_embedding_all"
+  dof_3_only: False 
+  noise: True 
+  pre_train_chk_path: "SavedModels/gemma_filtText_Trans_learnEmb_weightInit_batchNorm_covReduced--12-24-21-13-E60.pth"
+
+spacetimeformer_params:
+  context_channels: 8   #6 pose and 2 actions
+  target_channels: 8 # same
+  time_features: 1  #1D relative time (not my preference)
+  pre_train_chk_path: "SavedModels/gemma_filtText_Trans_learnEmb_weightInit_batchNorm_covReduced--12-24-21-13-E60.pth"
+
+  # Transformer Architecture
+  token_dim: 128
+  num_heads: 4
+  feedforward_dim: 512
+  encoder_layers: 2
+  decoder_layers: 2
+  dropout: 0.2
+  dropout_qkv: 0.0
+  dropout_attn_matrix: 0.0
+  performer_attn_kernel: "relu"
+  performer_redraw_interval: 1000
+  embedding_dropout: 0.1
+  embedding_method: "spatio-temporal"
+  start_token_length: 0
+  pad_value: None
+  damge_dim: 128
+  horizon_length: 2
+
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "action_seq"
+  gt_pose_key: "res_del_pose_seq"
+  future_actions_key: "fut_action_seq"
+  damage_embedding_key: "text_embedding_all"
+
+crossformer_params:
+  input_dim: 8
+  output_dim: 6
+  action_dim: 2
+  damage_dim: 128
+  in_len: 40
+  out_len: 10
+  seg_len: 4
+  win_size: 2
+  factor: 10
+  d_model: 256
+  d_ff: 512
+  n_heads: 4
+  e_layers: 3
+  dropout: 0.2
+  pre_train_chk_path: "SavedModels/gemma_filtText_Trans_learnEmb_weightInit_batchNorm_covReduced--12-24-21-13-E60.pth"
+  data_stats: vw_stats_new.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "ctrl_seq"
+  gt_pose_key: "res_del_pose_seq"
+  future_actions_key: "fut_ctrl_seq"
+
+anycar_transformer:
+  state_dim: 9
+  action_dim: 2
+  output_dim: 6
+  latent_dim: 64
+  num_heads: 4
+  num_layers: 2
+  dropout: 0.2
+  horizon_length: 2
+  data_frequency: 20
+  prediction_horizon: 10
+
+  root: ExtractedPkl/DamagedVehicle
+  # root: ExtractedPkl/FineTune/fall #only used for training
+  data_stats: vw_stats_new.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "ctrl_seq"
+  gt_pose_key: "res_del_pose_seq"
+  future_actions_key: "fut_ctrl_seq"
+  velocity_key : "vel_seq"
+  # velocity_key : "velocity"
+  attack: True 
+  noise: True 
+  mask_ratio: 0.1
+  dof_3_only: False
+
+clean_dynamics_model: 
+  state_dim: 6
+  action_dim: 2
+  output_dim: 6
+  latent_dim: 64
+  text_projector_latent_dim: 128 
+  num_heads: 4
+  num_encoder_layers: 2
+  num_decoder_layers: 2
+  feedforward_dim_encoder: 256
+  feedforward_dim_decoder: 256
+  dropout: 0.2
+  horizon_length: 2
+  noise: True 
+
+  data_frequency: 20
+  history_length: 40
+  # in_features: 8
+  prediction_horizon: 10
+  root: VW_ExtractedPKL/finetune/fl_punc/
+  data_stats: vw_stats_new.pkl
+  pose_key_10s: "del_pose_seq"
+  actions_key_10s: "ctrl_seq"
+  future_actions_key: "fut_ctrl_seq"
+  gt_pose_key: "res_del_pose_seq"
+
+#For resuming training
+directory:
+  model_name: "cleanTransformerEncDec--02-01-23-57-E49."
+  save: SavedModels
+  load: "SavedModels/cleanTransformerEncDec--02-01-23-57-E49.pth"
+  finetune_from: "SavedModels/cleanTransformerEncDec--02-01-23-57-E49.pth"
+  # finetune_from: "SavedModels/crossformer_6dof_damage--01-24-15-49-E60.pth"
+  # finetune_from: "SavedModels/anycar_6dof--01-27-01-26-E21.pth"
+  # load: "SavedModels/crossformer_3_dof--01-23-14-43/crossformer_3_dof--01-23-14-43-E20.pth" # path to load model for resuming training or testing
+
+pretraining:
+  text_dim: 768
+  signature_dim: 128
+
+model:
+  embedding_model: "embedding_gemma"
+  text_dim: 768
+  signature_dim: 128
+  pose_dim: 6
+  action_dim: 2
+
+# optimizer parameters
+adamw:
+  lr: 5e-4
+  betas:
+    - 0.9
+    - 0.999
+  eps: 1e-8
+  weight_decay: 0.03
+  amsgrad: False
+
+adam:
+  lr: 5e-4
+  betas:
+    - 0.9
+    - 0.999
+  eps: 1e-8
+  weight_decay: 0.03
+  amsgrad: False
+
+# RMSprop parameters if using RMSprop optimizer
+rmsprop:
+  lr: 1e-3
+  momentum: 0
+  alpha: 0.99
+  eps: 1e-8
+  centered: False
+  weight_decay: 0
+
+# SGD parameters if using SGD optimizer
+sgd:
+  lr: 5e-2
+  momentum: 0 # momentum factor
+  weight_decay: 0 # weight decay (L2 penalty)
+  dampening: 0 # dampening for momentum
+  nesterov: False # enables Nesterov momentum
