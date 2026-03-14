@@ -12,7 +12,7 @@ Based on the project structure and training scripts found in your files, here is
 
 # ZLIK: "Zero-Shot Language-Informed Kinodynamics"
 
-![Motivation](./motivation.pdf)
+![Motivation](./Motivation.pdf)
 
 ### Language-Informed Kinodynamics Model for Structurally Damaged Robots
 
