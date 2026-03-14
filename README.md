@@ -14,9 +14,9 @@ Based on the project structure and training scripts found in your files, here is
 
 ### Language-Informed Kinodynamics Model for Structurally Damaged Robots
 
-📄 **Checkout our paper:** [Link to Paper (arXiv:XXXX.XXXXX)]
+📄 **Checkout our paper:** [https://arxiv.org/abs/2602.12385]
 
-🎥 **Checkout our Video:** [Video Link]
+🎥 **Checkout our Video:** [(https://www.youtube.com/watch?v=QbtaDONTQdQ&)]
 
 ---
 
@@ -118,11 +118,14 @@ python3 TrainingPipeline/zlik_train.py --conf TrainingPipeline/conf/damaged_mode
 If you find this work useful, please cite our manuscript:
 
 ```bibtex
-@article{pokhrel2026zlik,
-  title={ZLIK: Zero-Shot Language-Informed Kinodynamics for Structurally Damaged Robots},
-  author={Pokhrel, Anuj and others},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
-  year={2026}
+@misc{pokhrel2026zeroshot,
+      title={Zero-Shot Adaptation to Robot Structural Damage via Natural Language-Informed Kinodynamics Modeling}, 
+      author={Anuj Pokhrel and Aniket Datar and Mohammad Nazeri and Francesco Cancelliere and Xuesu Xiao},
+      year={2026},
+      eprint={2602.12385},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2602.12385}, 
 }
 
 ```
